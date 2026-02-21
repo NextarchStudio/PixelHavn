@@ -20,21 +20,21 @@
     "eula"
   ],
   "docker_images": {
-    "ghcr.io/pelican-eggs/yolks:debian": "ghcr.io/pelican-eggs/yolks:debian"
+    "ghcr.io/nextarch-studio/yolks:php8.2-node20": "ghcr.io/nextarch-studio/yolks:php8.2-node20"
   },
   "file_denylist": [],
   "startup_commands": {
-    "PixelHavn": "/bin/bash -lc 'set -e; export DEBIAN_FRONTEND=noninteractive; apt-get update; apt-get install -y --no-install-recommends ca-certificates curl git unzip gnupg lsb-release software-properties-common apt-transport-https; if ! command -v php >/dev/null 2>&1; then add-apt-repository -y ppa:ondrej/php; apt-get update; apt-get install -y --no-install-recommends php8.2-cli php8.2-common php8.2-mysql php8.2-mbstring php8.2-xml php8.2-intl php8.2-zip php8.2-curl php8.2-redis; fi; if ! command -v node >/dev/null 2>&1; then curl -fsSL https://deb.nodesource.com/setup_20.x | bash -; apt-get update; apt-get install -y --no-install-recommends nodejs; fi; if ! command -v composer >/dev/null 2>&1; then curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; fi; if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env; fi; composer install --no-interaction --prefer-dist; cd realtime && npm install --omit=dev && cd ..; php spark migrate --all --no-interaction; php spark db:seed DatabaseSeeder; node realtime/src/server.js & php -S 0.0.0.0:${SERVER_PORT} -t public'"
+    "PixelHavn": "/bin/bash -lc 'set -e; command -v php >/dev/null 2>&1 || (echo \"Missing php in runtime image\" && exit 1); command -v node >/dev/null 2>&1 || (echo \"Missing node in runtime image\" && exit 1); if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env; fi; node realtime/src/server.js & php -S 0.0.0.0:${SERVER_PORT} -t public'"
   },
   "config": {
-    "files": "{\r\n    \".env\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"CI_ENVIRONMENT\": \"{{server.build.env.CI_ENVIRONMENT}}\",\r\n            \"app.baseURL\": \"{{server.build.env.APP_BASE_URL}}\",\r\n            \"database.default.hostname\": \"{{server.build.env.DB_HOST}}\",\r\n            \"database.default.database\": \"{{server.build.env.DB_DATABASE}}\",\r\n            \"database.default.username\": \"{{server.build.env.DB_USERNAME}}\",\r\n            \"database.default.password\": \"{{server.build.env.DB_PASSWORD}}\",\r\n            \"database.default.port\": \"{{server.build.env.DB_PORT}}\",\r\n            \"cache.redis.host\": \"{{server.build.env.REDIS_HOST}}\",\r\n            \"cache.redis.port\": \"{{server.build.env.REDIS_PORT}}\",\r\n            \"jwt.secret\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"realtime.sharedSecret\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"realtime.url\": \"{{server.build.env.REALTIME_URL}}\",\r\n            \"webauthn.rpId\": \"{{server.build.env.WEBAUTHN_RP_ID}}\",\r\n            \"webauthn.origin\": \"{{server.build.env.WEBAUTHN_ORIGIN}}\",\r\n            \"REALTIME_PORT\": \"{{server.build.default.port}}\",\r\n            \"REALTIME_CI_API_BASE\": \"{{server.build.env.REALTIME_CI_API_BASE}}\",\r\n            \"REALTIME_JWT_SECRET\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"REALTIME_SHARED_SECRET\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"REALTIME_REDIS_URL\": \"{{server.build.env.REALTIME_REDIS_URL}}\",\r\n            \"REALTIME_CHAT_LIMIT\": \"{{server.build.env.REALTIME_CHAT_LIMIT}}\",\r\n            \"REALTIME_CHAT_WINDOW_SECONDS\": \"{{server.build.env.REALTIME_CHAT_WINDOW_SECONDS}}\"\r\n        }\r\n    }\r\n}",
+    "files": "{\r\n    \".env\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"CI_ENVIRONMENT\": \"{{server.build.env.CI_ENVIRONMENT}}\",\r\n            \"app.baseURL\": \"{{server.build.env.APP_BASE_URL}}\",\r\n            \"database.default.hostname\": \"{{server.build.env.DB_HOST}}\",\r\n            \"database.default.database\": \"{{server.build.env.DB_DATABASE}}\",\r\n            \"database.default.username\": \"{{server.build.env.DB_USERNAME}}\",\r\n            \"database.default.password\": \"{{server.build.env.DB_PASSWORD}}\",\r\n            \"database.default.port\": \"{{server.build.env.DB_PORT}}\",\r\n            \"cache.redis.host\": \"{{server.build.env.REDIS_HOST}}\",\r\n            \"cache.redis.port\": \"{{server.build.env.REDIS_PORT}}\",\r\n            \"jwt.secret\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"realtime.sharedSecret\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"realtime.url\": \"{{server.build.env.REALTIME_URL}}\",\r\n            \"webauthn.rpId\": \"{{server.build.env.WEBAUTHN_RP_ID}}\",\r\n            \"webauthn.origin\": \"{{server.build.env.WEBAUTHN_ORIGIN}}\",\r\n            \"REALTIME_PORT\": \"{{server.build.env.REALTIME_PORT}}\",\r\n            \"REALTIME_CI_API_BASE\": \"{{server.build.env.REALTIME_CI_API_BASE}}\",\r\n            \"REALTIME_JWT_SECRET\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"REALTIME_SHARED_SECRET\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"REALTIME_REDIS_URL\": \"{{server.build.env.REALTIME_REDIS_URL}}\",\r\n            \"REALTIME_CHAT_LIMIT\": \"{{server.build.env.REALTIME_CHAT_LIMIT}}\",\r\n            \"REALTIME_CHAT_WINDOW_SECONDS\": \"{{server.build.env.REALTIME_CHAT_WINDOW_SECONDS}}\"\r\n        }\r\n    }\r\n}",
     "startup": "{\r\n    \"done\": \"Development Server\"\r\n}",
     "logs": "{}",
     "stop": "^C"
   },
   "scripts": {
     "installation": {
-      "script": "#!/bin/bash\nset -e\n\napt-get update\napt-get install -y --no-install-recommends ca-certificates curl git unzip rsync\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nif [ -n \"${GIT_ADDRESS}\" ]; then\n  if [ ! -d .git ]; then\n    git clone --depth 1 --branch \"${GIT_BRANCH}\" \"${GIT_ADDRESS}\" .\n  else\n    git fetch --all --prune\n    git checkout \"${GIT_BRANCH}\"\n    git pull --ff-only\n  fi\nfi\n\nif [ ! -f .env ] && [ -f .env.example ]; then\n  cp .env.example .env\nfi\n\necho \"Installation complete. Server startup will install composer/npm dependencies and run migrations.\"",
+      "script": "#!/bin/bash\nset -e\n\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get install -y --no-install-recommends ca-certificates curl git unzip rsync gnupg lsb-release software-properties-common apt-transport-https\n\nif ! command -v php >/dev/null 2>&1; then\n  add-apt-repository -y ppa:ondrej/php\n  apt-get update\n  apt-get install -y --no-install-recommends php8.2-cli php8.2-common php8.2-mysql php8.2-mbstring php8.2-xml php8.2-intl php8.2-zip php8.2-curl php8.2-redis\nfi\n\nif ! command -v node >/dev/null 2>&1; then\n  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -\n  apt-get update\n  apt-get install -y --no-install-recommends nodejs\nfi\n\nif ! command -v composer >/dev/null 2>&1; then\n  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer\nfi\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nif [ -n \"${GIT_ADDRESS}\" ]; then\n  if [ ! -d .git ]; then\n    git clone --depth 1 --branch \"${GIT_BRANCH}\" \"${GIT_ADDRESS}\" .\n  else\n    git fetch --all --prune\n    git checkout \"${GIT_BRANCH}\"\n    git pull --ff-only\n  fi\nfi\n\nif [ ! -f .env ] && [ -f .env.example ]; then\n  cp .env.example .env\nfi\n\ncomposer install --no-interaction --prefer-dist\ncd realtime\nnpm install --omit=dev\ncd ..\n\nphp spark migrate --all --no-interaction\nphp spark db:seed DatabaseSeeder\n\necho \"Installation complete.\"",
       "container": "ghcr.io/pelican-eggs/installers:debian",
       "entrypoint": "bash"
     }
@@ -44,7 +44,7 @@
       "name": "Git Repo URL",
       "description": "Git repository for PixelHavn.",
       "env_variable": "GIT_ADDRESS",
-      "default_value": "https://github.com/Nextarch-Studio/pixelhavn.git",
+      "default_value": "https://github.com/NextarchStudio/PixelHavn.git",
       "user_viewable": true,
       "user_editable": true,
       "rules": "required|string|max:255"
@@ -165,6 +165,15 @@
       "user_viewable": true,
       "user_editable": true,
       "rules": "required|string|max:255"
+    },
+    {
+      "name": "Realtime Port",
+      "description": "Port used by Socket.IO realtime service.",
+      "env_variable": "REALTIME_PORT",
+      "default_value": "3001",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|between:1024,65535"
     },
     {
       "name": "Realtime CI API Base",

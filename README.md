@@ -176,7 +176,12 @@ docker compose exec app php vendor/bin/phpunit
 ## Pelican/Pterodactyl Egg
 
 - Egg file: `PixelHavn.json`
-- Runtime image: `ghcr.io/pelican-eggs/yolks:debian`
-- Egg startup bootstraps PHP 8.2, Node 20, and Composer automatically.
+- Runtime image: `ghcr.io/nextarch-studio/yolks:php8.2-node20`
+- Pelican startup runs as non-root, so PHP/Node/Composer must already exist in the runtime image.
 - Import `PixelHavn.json` in panel, create server, set DB/Redis vars, then start server.
-- For production, a prebuilt custom yolk is still recommended to avoid apt install on each boot.
+- Build/push runtime image:
+
+```bash
+docker build -t ghcr.io/nextarch-studio/yolks:php8.2-node20 -f docker/pelican-runtime/Dockerfile .
+docker push ghcr.io/nextarch-studio/yolks:php8.2-node20
+```
