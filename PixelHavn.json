@@ -1,0 +1,224 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL",
+  "meta": {
+    "version": "PLCN_v3",
+    "update_url": ""
+  },
+  "exported_at": "2026-02-21T20:10:00+00:00",
+  "name": "PixelHavn (CI4 + Node Realtime)",
+  "author": "support@nextarch.studio",
+  "uuid": "3eb69158-920a-47a2-a820-11fb244370ad",
+  "description": "PixelHavn MVP i en container (CodeIgniter 4 + Socket.IO). Krever ekstern MariaDB og Redis.",
+  "tags": [
+    "php",
+    "codeigniter",
+    "nodejs",
+    "socket.io",
+    "pixelhavn"
+  ],
+  "features": [
+    "eula"
+  ],
+  "docker_images": {
+    "ghcr.io/pelican-eggs/yolks:debian": "ghcr.io/pelican-eggs/yolks:debian"
+  },
+  "file_denylist": [],
+  "startup_commands": {
+    "PixelHavn": "/bin/bash -lc 'set -e; export DEBIAN_FRONTEND=noninteractive; apt-get update; apt-get install -y --no-install-recommends ca-certificates curl git unzip gnupg lsb-release software-properties-common apt-transport-https; if ! command -v php >/dev/null 2>&1; then add-apt-repository -y ppa:ondrej/php; apt-get update; apt-get install -y --no-install-recommends php8.2-cli php8.2-common php8.2-mysql php8.2-mbstring php8.2-xml php8.2-intl php8.2-zip php8.2-curl php8.2-redis; fi; if ! command -v node >/dev/null 2>&1; then curl -fsSL https://deb.nodesource.com/setup_20.x | bash -; apt-get update; apt-get install -y --no-install-recommends nodejs; fi; if ! command -v composer >/dev/null 2>&1; then curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; fi; if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env; fi; composer install --no-interaction --prefer-dist; cd realtime && npm install --omit=dev && cd ..; php spark migrate --all --no-interaction; php spark db:seed DatabaseSeeder; node realtime/src/server.js & php -S 0.0.0.0:${SERVER_PORT} -t public'"
+  },
+  "config": {
+    "files": "{\r\n    \".env\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"CI_ENVIRONMENT\": \"{{server.build.env.CI_ENVIRONMENT}}\",\r\n            \"app.baseURL\": \"{{server.build.env.APP_BASE_URL}}\",\r\n            \"database.default.hostname\": \"{{server.build.env.DB_HOST}}\",\r\n            \"database.default.database\": \"{{server.build.env.DB_DATABASE}}\",\r\n            \"database.default.username\": \"{{server.build.env.DB_USERNAME}}\",\r\n            \"database.default.password\": \"{{server.build.env.DB_PASSWORD}}\",\r\n            \"database.default.port\": \"{{server.build.env.DB_PORT}}\",\r\n            \"cache.redis.host\": \"{{server.build.env.REDIS_HOST}}\",\r\n            \"cache.redis.port\": \"{{server.build.env.REDIS_PORT}}\",\r\n            \"jwt.secret\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"realtime.sharedSecret\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"realtime.url\": \"{{server.build.env.REALTIME_URL}}\",\r\n            \"webauthn.rpId\": \"{{server.build.env.WEBAUTHN_RP_ID}}\",\r\n            \"webauthn.origin\": \"{{server.build.env.WEBAUTHN_ORIGIN}}\",\r\n            \"REALTIME_PORT\": \"{{server.build.default.port}}\",\r\n            \"REALTIME_CI_API_BASE\": \"{{server.build.env.REALTIME_CI_API_BASE}}\",\r\n            \"REALTIME_JWT_SECRET\": \"{{server.build.env.JWT_SECRET}}\",\r\n            \"REALTIME_SHARED_SECRET\": \"{{server.build.env.REALTIME_SHARED_SECRET}}\",\r\n            \"REALTIME_REDIS_URL\": \"{{server.build.env.REALTIME_REDIS_URL}}\",\r\n            \"REALTIME_CHAT_LIMIT\": \"{{server.build.env.REALTIME_CHAT_LIMIT}}\",\r\n            \"REALTIME_CHAT_WINDOW_SECONDS\": \"{{server.build.env.REALTIME_CHAT_WINDOW_SECONDS}}\"\r\n        }\r\n    }\r\n}",
+    "startup": "{\r\n    \"done\": \"Development Server\"\r\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\nset -e\n\napt-get update\napt-get install -y --no-install-recommends ca-certificates curl git unzip rsync\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nif [ -n \"${GIT_ADDRESS}\" ]; then\n  if [ ! -d .git ]; then\n    git clone --depth 1 --branch \"${GIT_BRANCH}\" \"${GIT_ADDRESS}\" .\n  else\n    git fetch --all --prune\n    git checkout \"${GIT_BRANCH}\"\n    git pull --ff-only\n  fi\nfi\n\nif [ ! -f .env ] && [ -f .env.example ]; then\n  cp .env.example .env\nfi\n\necho \"Installation complete. Server startup will install composer/npm dependencies and run migrations.\"",
+      "container": "ghcr.io/pelican-eggs/installers:debian",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Git Repo URL",
+      "description": "Git repository for PixelHavn.",
+      "env_variable": "GIT_ADDRESS",
+      "default_value": "https://github.com/Nextarch-Studio/pixelhavn.git",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Git Branch",
+      "description": "Branch/tag to deploy.",
+      "env_variable": "GIT_BRANCH",
+      "default_value": "main",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:64"
+    },
+    {
+      "name": "CI Environment",
+      "description": "CodeIgniter environment mode.",
+      "env_variable": "CI_ENVIRONMENT",
+      "default_value": "production",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|in:development,testing,production"
+    },
+    {
+      "name": "App Base URL",
+      "description": "Public base URL with trailing slash.",
+      "env_variable": "APP_BASE_URL",
+      "default_value": "http://127.0.0.1/",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "DB Host",
+      "description": "MariaDB hostname.",
+      "env_variable": "DB_HOST",
+      "default_value": "127.0.0.1",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "DB Port",
+      "description": "MariaDB port.",
+      "env_variable": "DB_PORT",
+      "default_value": "3306",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|between:1,65535"
+    },
+    {
+      "name": "DB Name",
+      "description": "MariaDB database name.",
+      "env_variable": "DB_DATABASE",
+      "default_value": "pixelhavn",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:64"
+    },
+    {
+      "name": "DB User",
+      "description": "MariaDB username.",
+      "env_variable": "DB_USERNAME",
+      "default_value": "pixelhavn",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:64"
+    },
+    {
+      "name": "DB Password",
+      "description": "MariaDB password.",
+      "env_variable": "DB_PASSWORD",
+      "default_value": "",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "nullable|string|max:255"
+    },
+    {
+      "name": "Redis Host",
+      "description": "Redis hostname.",
+      "env_variable": "REDIS_HOST",
+      "default_value": "127.0.0.1",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Redis Port",
+      "description": "Redis port.",
+      "env_variable": "REDIS_PORT",
+      "default_value": "6379",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|between:1,65535"
+    },
+    {
+      "name": "JWT Secret",
+      "description": "Shared JWT secret between CI4 and realtime service.",
+      "env_variable": "JWT_SECRET",
+      "default_value": "CHANGE_ME_SUPER_LONG_RANDOM_SECRET",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "required|string|min:32|max:255"
+    },
+    {
+      "name": "Realtime Shared Secret",
+      "description": "Shared secret for /api/realtime/event.",
+      "env_variable": "REALTIME_SHARED_SECRET",
+      "default_value": "CHANGE_ME_REALTIME_SHARED_SECRET",
+      "user_viewable": false,
+      "user_editable": true,
+      "rules": "required|string|min:24|max:255"
+    },
+    {
+      "name": "Realtime Public URL",
+      "description": "Public URL for Socket.IO service.",
+      "env_variable": "REALTIME_URL",
+      "default_value": "http://127.0.0.1:3001",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Realtime CI API Base",
+      "description": "Internal base URL used by realtime to call CI API.",
+      "env_variable": "REALTIME_CI_API_BASE",
+      "default_value": "http://127.0.0.1:8080",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Realtime Redis URL",
+      "description": "Redis URL used by realtime service.",
+      "env_variable": "REALTIME_REDIS_URL",
+      "default_value": "redis://127.0.0.1:6379",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "Chat Rate Limit",
+      "description": "Messages allowed per window.",
+      "env_variable": "REALTIME_CHAT_LIMIT",
+      "default_value": "5",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|min:1|max:50"
+    },
+    {
+      "name": "Chat Rate Window",
+      "description": "Rate limit window in seconds.",
+      "env_variable": "REALTIME_CHAT_WINDOW_SECONDS",
+      "default_value": "10",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|min:1|max:120"
+    },
+    {
+      "name": "WebAuthn RP ID",
+      "description": "Passkey relying-party ID (domain only).",
+      "env_variable": "WEBAUTHN_RP_ID",
+      "default_value": "localhost",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    },
+    {
+      "name": "WebAuthn Origin",
+      "description": "Passkey origin URL.",
+      "env_variable": "WEBAUTHN_ORIGIN",
+      "default_value": "http://localhost",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:255"
+    }
+  ]
+}
